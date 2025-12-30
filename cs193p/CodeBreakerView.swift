@@ -14,14 +14,27 @@ struct CodeBreakerView: View {
     
     var body: some View {
         VStack {
+            HStack(content: {
+                Spacer()
+                Button("Restart Game") {
+                    withAnimation {
+                        game.restart()
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.orange)
+                .padding([.bottom], 8)
+            })
             view(for: game.masterCode)
             ScrollView(content: {
                 view(for: game.guess)
                 ForEach(game.attempts.indices.reversed(), id: \.self) { index in
                     view(for: game.attempts[index])
                 }
+                // Restart
                 
             })
+            
         }
         .padding()
     }
@@ -35,6 +48,8 @@ struct CodeBreakerView: View {
         .font(.system(size: 80))
         .minimumScaleFactor(0.1)
     }
+    
+    
     
     func view(for code: Code) -> some View {
         HStack {

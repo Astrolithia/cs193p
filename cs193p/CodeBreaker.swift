@@ -46,6 +46,12 @@ struct CodeBreaker {
             guess.pegs[index] = pegChoices.first ?? Code.missing
         }
     }
+    
+    mutating func restart() {
+        attempts = []
+        masterCode.randomize(from: pegChoices)
+        guess.pegs = Array(repeating: Code.missing, count: guess.pegs.count)
+    }
 }
 
 
