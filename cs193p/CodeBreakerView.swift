@@ -8,9 +8,7 @@
 import SwiftUI
 
 struct CodeBreakerView: View {
-    @State var game = CodeBreaker(
-        pegChoices: [.brown, .yellow, .orange, .black]
-    )
+    @State var game = CodeBreaker()
     
     var body: some View {
         VStack {
@@ -25,17 +23,17 @@ struct CodeBreakerView: View {
                 .tint(.orange)
                 .padding([.bottom], 8)
             })
+            
             view(for: game.masterCode)
+            
             ScrollView(content: {
                 view(for: game.guess)
                 ForEach(game.attempts.indices.reversed(), id: \.self) { index in
                     view(for: game.attempts[index])
                 }
-                // Restart
-                
             })
-            
         }
+        .id(game.id)
         .padding()
     }
     
@@ -45,25 +43,22 @@ struct CodeBreakerView: View {
                 game.attemptGuess()
             }
         }
-        .font(.system(size: 80))
+        .font(.system(size: 20))
         .minimumScaleFactor(0.1)
     }
     
     
-    
     func view(for code: Code) -> some View {
         HStack {
+            
             ForEach(code.pegs.indices, id: \.self) { index in
-                RoundedRectangle(cornerRadius: 10)
-                    .overlay {
-                        if code.pegs[index] == Code.missing {
-                            RoundedRectangle(cornerRadius: 10)
-                                .strokeBorder(Color.gray)
-                        }
-                    }
+                ZStack(content: {
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(pegColor(for: code.pegs[index]))
+                    pegView(for: code.pegs[index])
+                })
                     .contentShape(Rectangle())
                     .aspectRatio(1, contentMode: .fit)
-                    .foregroundStyle(code.pegs[index])
                     .onTapGesture {
                         if code.kind == .guess {
                             game.changeGuessPeg(at: index)
@@ -71,11 +66,42 @@ struct CodeBreakerView: View {
                     }
             }
             MathchMarkers(matches: code.matches)
-                .overlay{
-                    if code.kind == .guess {
-                        guessButton
-                    }
-                }
+            
+            if code.kind == .guess {
+                guessButton
+            }
+        }
+    }
+    
+    @ViewBuilder
+    func pegView(for peg: Peg) -> some View {
+        if peg.isEmpty {
+            RoundedRectangle(cornerRadius: 10)
+                .strokeBorder(Color.gray, lineWidth: 2)
+        } else if game.mode == .emoji {
+            Text(peg)
+                .font(.system(size: 40))
+                .minimumScaleFactor(0.1)
+        } else {
+            EmptyView()
+        }
+    }
+    
+    func pegColor(for peg: Peg) -> Color {
+        if game.mode == .emoji || peg.isEmpty {
+            return .clear
+        }
+        
+        switch peg {
+        case "red": return .red
+        case "blue": return .blue
+        case "green": return .green
+        case "yellow": return .yellow
+        case "orange": return .orange
+        case "purple": return .purple
+        case "brown": return .brown
+        case "black": return .black
+        default: return .clear
         }
     }
 }

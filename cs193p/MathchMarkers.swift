@@ -17,15 +17,24 @@ struct MathchMarkers: View {
     var matches: [Match]
     
     var body: some View {
+        let rows = (matches.count + 1) / 2
+        let columns = 2
+        
         VStack(content: {
-            HStack(content: {
-                matchMarker(peg: 0)
-                matchMarker(peg: 1)
-            })
-            HStack(content: {
-                matchMarker(peg: 2)
-                matchMarker(peg: 3)
-            })
+            ForEach(0..<rows, id: \.self){ row in
+                HStack(content: {
+                    ForEach(0..<columns, id: \.self) { col in
+                        let index = row * columns + col
+                        if index < matches.count {
+                            matchMarker(peg: index)
+                        } else {
+                            Circle()
+                                .fill(Color.clear)
+                                .aspectRatio(1, contentMode: .fit)
+                        }
+                    }
+                })
+            }
         })
         
     }
